@@ -39,36 +39,30 @@ if __name__=="__main__":
     print("Preparing datatloaders ...")
     val_dataloader = DataLoader(data, batch_size = 1, shuffle=False, num_workers = opt.n_workers, pin_memory = True, drop_last=False)
     print("Length of validation datatloader = ",len(val_dataloader))
-  
+    
+    # Loading model and checkpoint
+    model, parameters = generate_model(opt)
+    if opt.resume_path1:
+        print('loading checkpoint {}'.format(opt.resume_path1))
+        checkpoint = torch.load(opt.resume_path1)
+        assert opt.arch == checkpoint['arch']
+        model.load_state_dict(checkpoint['state_dict'])
+    model.eval()
+
     accuracies = AverageMeter()
     clip_accuracies = AverageMeter()
     
+    #Path to store results
     result_path = "{}/{}/".format(opt.result_path, opt.dataset)
     if not os.path.exists(result_path):
-        os.makedirs(result_path)
-
-    if not os.path.exists(result_path):
-        os.mkdir(result_path)
-    
-    model, parameters = generate_model(opt)
-
-    if opt.resume_path:
-        print('loading checkpoint {}'.format(opt.resume_path))
-        checkpoint = torch.load(opt.resume_path)
-        assert opt.arch == checkpoint['arch']
-        model.load_state_dict(checkpoint['state_dict'])
+        os.makedirs(result_path)    
 
     if opt.log:
-        if opt.dataset == 'Kinetics':
-            f = open(os.path.join(result_path, "test_{}{}_{}_{}_{}.txt".format(opt.model, opt.model_depth, opt.dataset, opt.modality, opt.sample_duration)), 'w+')
-        else:
-            f = open(os.path.join(result_path, "test_preKin_{}{}_{}_{}_{}_{}.txt".format( opt.model, opt.model_depth, opt.dataset, opt.split, opt.modality, opt.sample_duration)), 'w+')
+        f = open(os.path.join(result_path, "test_{}{}_{}_{}_{}_{}.txt".format( opt.model, opt.model_depth, opt.dataset, opt.split, opt.modality, opt.sample_duration)), 'w+')
         f.write(str(opt))
         f.write('\n')
         f.flush()
-    
-    model.eval()
-    
+        
     with torch.no_grad():   
         for i, (clip, label) in enumerate(val_dataloader):
             clip = torch.squeeze(clip)
