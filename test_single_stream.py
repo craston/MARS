@@ -19,11 +19,9 @@ import torch.utils
 import sys
 from utils import *
 import pdb
-
-def softmax(inputs):
-    return np.exp(inputs)/np.sum(np.exp(inputs))
     
 if __name__=="__main__":
+    # print configuration options
     opt = parse_opts()
     print(opt)
     

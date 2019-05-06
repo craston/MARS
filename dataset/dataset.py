@@ -10,7 +10,17 @@ import pickle
 #import dircache
 import pdb
 
+
 def get_test_video(opt, frame_path, Total_frames):
+    """
+        Args:
+            opt         : config options
+            frame_path  : frames of video frames
+            Total_frames: Number of frames in the video
+        Returns:
+            list(frames) : list of all video frames
+        """
+
     clip = []
     i = 0
     loop = 0
@@ -69,9 +79,11 @@ class HMDB51_test(Dataset):
     def __init__(self, train, opt, split=None):
         """
         Args:
-        size = frame height of videos
-        split = 1,2,3,all
-        train = 1 load training else load testing
+            opt   : config options
+            train : Should be 0 while testing
+            split : 1,2,3 
+        Returns:
+            (tensor(frames), class_id ): Shape of tensor C x T x H x W
         """
         self.train_test = train
         self.opt = opt
@@ -102,9 +114,11 @@ class HMDB51_test(Dataset):
             f.close()
 
     def __len__(self):
+        '''
+        returns number of test set
+        ''' 
         return len(self.data)
 
-    #returns clip of nb_frames
     def __getitem__(self, idx):
         video = self.data[idx]
         label_id = self.lab_names.get(video[1])
@@ -121,13 +135,15 @@ class HMDB51_test(Dataset):
 
 
 class UCF101_test(Dataset):
-    """HMDB51 Dataset"""
+    """UCF101 Dataset"""
     def __init__(self, train, opt, split=None):
         """
         Args:
-        size = frame height of videos
-        split = 1,2,3,all
-        train = 1 load training else load testing
+            opt   : config options
+            train : Should be 0 while testing
+            split : 1,2,3 
+        Returns:
+            (tensor(frames), class_id ): Shape of tensor C x T x H x W
         """
         self.train_test = train
         self.opt = opt
@@ -136,7 +152,7 @@ class UCF101_test(Dataset):
 
         # Number of classes
         self.N = len(self.lab_names)
-        assert self.N == 51
+        assert self.N == 101
 
         self.lab_names = dict(zip(self.lab_names, range(self.N)))   # Each label is mappped to a number
 
@@ -158,9 +174,11 @@ class UCF101_test(Dataset):
             f.close()
 
     def __len__(self):
+        '''
+        returns number of test set
+        ''' 
         return len(self.data)
 
-    #returns clip of nb_frames
     def __getitem__(self, idx):
         video = self.data[idx]
         label_id = self.lab_names.get(video[1])
@@ -179,14 +197,15 @@ class Kinetics_test(Dataset):
     def __init__(self, split, train, opt):
         """
         Args:
-        size = frame height of videos
-        split = 1,2,3,all
-        train = 1 load training else load testing
+            opt   : config options
+            train : Should be 0 while testing
+            split : 'val'
+        Returns:
+            (tensor(frames), class_id ) : Shape of tensor C x T x H x W
         """
-        self.name = 'Kinetics'
         self.split = split
         self.opt = opt
-        self.train_val = 0
+        self.train_val = train
               
         # joing labnames with underscores
         self.lab_names = sorted([f for f in os.listdir(os.path.join(self.__root_dir, "train"))])        
@@ -196,7 +215,7 @@ class Kinetics_test(Dataset):
         assert self.N == 400
         
         # indexes for validation set
-        label_file = opt.annotation_path
+        label_file = self.opt.annotation_path
      
         self.data = []                                     # (filename , lab_id)
     
@@ -209,7 +228,7 @@ class Kinetics_test(Dataset):
             
     def __len__(self):
         '''
-        returns number of videos train/test
+        returns number of test set
         '''          
         return len(self.data)
 

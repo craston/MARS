@@ -22,7 +22,6 @@ def generate_model( opt):
     model = model.cuda()
     model = nn.DataParallel(model)
     
-    #pdb.set_trace()
     if opt.pretrain_path:
         print('loading pretrained model {}'.format(opt.pretrain_path))
         pretrain = torch.load(opt.pretrain_path)

@@ -270,8 +270,30 @@ def get_std(dataset = 'HMDB51'):
         return [0.20658244577568*255, 0.20174469333003*255, 0.19790770088352*255]
 
 
-def scale_crop(clip, train, opt):  
-    processed_clip = torch.Tensor(3, len(clip), opt.sample_size, opt.sample_size)
+def scale_crop(clip, train, opt): 
+    """Preprocess list(frames) based on train/test and modality.
+    Training:
+        - Multiscale corner crop
+        - Random Horizonatal Flip (change direction of Flow accordingly)
+        - Convert a ``PIL.Image`` or ``numpy.ndarray`` to tensor
+        - Normalize R,G,B based on mean and std of ``ActivityNet``
+    Testing:
+        - Scale frame
+        - Center crop
+        - Convert a ``PIL.Image`` or ``numpy.ndarray`` to tensor
+        - Normalize R,G,B based on mean and std of ``ActivityNet``
+    Args:
+        clip (list(frames)): list of RGB/Flow frames
+        train : 1 for train, 0 for test
+    Return:
+        Tensor(frames) of shape C x T x H x W
+    """
+    if opt.modality == 'RGB':
+        processed_clip = torch.Tensor(3, len(clip), opt.sample_size, opt.sample_size)
+    elif opt.modality == 'Flow':
+        processed_clip = torch.Tensor(2, int(len(clip)/2), opt.sample_size, opt.sample_size)
+    elif opt.modality == 'RGB_Flow':
+        processed_clip = torch.Tensor(5, int(len(clip)/3), opt.sample_size, opt.sample_size)
     
     flip_prob     = random.random()
     scale_factor  = scale_choice[random.randint(0, len(scale_choice) - 1)]
@@ -288,7 +310,7 @@ def scale_crop(clip, train, opt):
 
             elif op.modality == 'Flow':
                 if i%2 == 0 and flip_prob<0.5:
-                    I = ImageChops.invert(I)
+                    I = ImageChops.invert(I)                    # Flipping x-direction
                 I = ToTensor(1)(I)
                 I = Normalize([127.5, 127.5, 127.5], [1,1,1])(I)
                 if i%2 == 0:

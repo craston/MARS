@@ -21,7 +21,6 @@ def test():
     opt = parse_opts()
     print(opt)
     opt.arch = '{}-{}'.format(opt.model, opt.model_depth)
-    domain = socket.getfqdn().split('.')[-2]
     
     print("Preprocessing validation data ...")
     data   = globals()['{}_test'.format(opt.dataset)](split = opt.split, train = 0, opt = opt)
