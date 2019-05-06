@@ -68,7 +68,6 @@ conda install pytorch torchvision cudatoolkit=9.0 -c pytorch
 
 
 ## Datasets
-### Kinetics400
 
 * The datsets and splits can be downloaded from 
 
