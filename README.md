@@ -65,6 +65,18 @@ in due course of time.
 conda install pytorch torchvision cudatoolkit=9.0 -c pytorch
 ```
 
+* Directory tree
+~/
+  data/
+    kinetics_videos/
+      jpg/
+        .../ (directories of class names)
+          .../ (directories of video names)
+            ... (jpg files)
+    results/
+      save_100.pth
+    kinetics.json
+
 
 
 ## Datasets
