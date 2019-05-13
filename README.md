@@ -66,17 +66,19 @@ conda install pytorch torchvision cudatoolkit=9.0 -c pytorch
 ```
 
 * Directory tree
+ ```
 ~/
-  data/
-    kinetics_videos/
-      jpg/
-        .../ (directories of class names)
-          .../ (directories of video names)
-            ... (jpg files)
+    dataset/
+        HMDB51/ 
+            ../(dirs of class names)
+                ../(dirs of video names)
+        HMDB51_labels/
     results/
-      save_100.pth
-    kinetics.json
-
+        test.txt
+    trained_models/
+        HMDB51/
+            ../(.pth files)
+```
 
 
 ## Datasets
@@ -112,12 +114,12 @@ RGB_Kinetics_16f.pth indicates --modality RGB --dataset Kinetics --sample_durati
 For HMDB51 and UCF101, we have only provided trained models for the first split.
 
 ## Testing script
-For single stream models
+For single stream MARS: 
 
 ```
 python test_single_stream.py --batch_size 1 --n_classes 51 --model resnext --model_depth 101 \
---log 0 --dataset HMDB51 --modality RGB --sample_duration 16 --split 1 --only_RGB  \
---resume_path1 "trained_models/HMDB51/RGB_HMDB51_16f.pth" \
+--log 0 --dataset HMDB51 --modality MARS --sample_duration 16 --split 1 --only_RGB  \
+--resume_path1 "trained_models/HMDB51/MARS_HMDB51_16f.pth" \
 --frame_dir "dataset/HMDB51/" \
 --annotation_path "dataset/HMDB51_labels" \
 --result_path "results/"
