@@ -7,6 +7,7 @@ import numpy as np
 from .preprocess_data import *
 from PIL import Image, ImageFilter
 import pickle
+import glob
 #import dircache
 import pdb
 
@@ -125,9 +126,9 @@ class HMDB51_test(Dataset):
         frame_path = os.path.join(self.opt.frame_dir, video[1], video[0])
 
         if self.opt.only_RGB:
-            Total_frames = int(len(os.listdir(frame_path))) - 2    
+            Total_frames = len(glob.glob(frame_path +  '/0*.jpg'))  
         else:
-            Total_frames = int((len(os.listdir(frame_path)) + 1)/3) -1 
+            Total_frames = len(glob.glob(frame_path +  '/TVL1jpg_y_*.jpg'))
 
         clip = get_test_video(self.opt, frame_path, Total_frames)
                     
@@ -148,31 +149,36 @@ class UCF101_test(Dataset):
         self.train_test = train
         self.opt = opt
         
-        self.lab_names = sorted(set(['_'.join(os.path.splitext(file)[0].split('_')[:-2])for file in os.listdir(opt.annotation_path)]))
+        with open(os.path.join(self.opt.annotation_path, "classInd.txt")) as lab_file:
+            self.lab_names = [line.strip('\n').split(' ')[1] for line in lab_file]
+        
+        with open(os.path.join(self.opt.annotation_path, "classInd.txt")) as lab_file:
+            index = [int(line.strip('\n').split(' ')[0]) for line in lab_file]
 
         # Number of classes
         self.N = len(self.lab_names)
         assert self.N == 101
 
-        self.lab_names = dict(zip(self.lab_names, range(self.N)))   # Each label is mappped to a number
+        self.class_idx = dict(zip(self.lab_names, index))   # Each label is mappped to a number
+        self.idx_class = dict(zip(index, self.lab_names))   # Each number is mappped to a label
 
         # indexes for training/test set
         split_lab_filenames = sorted([file for file in os.listdir(opt.annotation_path) if file.strip('.txt')[-1] ==str(split)])
-       
+
+        if self.train_test:
+            split_lab_filenames = [f for f in split_lab_filenames if 'train' in f]
+        else:
+            split_lab_filenames = [f for f in split_lab_filenames if 'test' in f]
+        
         self.data = []                                     # (filename , lab_id)
         
-        for file in split_lab_filenames:
-            class_id = '_'.join(os.path.splitext(file)[0].split('_')[:-2])
-            f = open(os.path.join(opt.annotation_path, file), 'r')
-            for line in f:
-                if line.split(' ')[1] == '2':
-                    frame_path = os.path.join(opt.frame_dir, class_id, line.split(' ')[0][:-4])
-                    if opt.only_RGB and "done" in os.listdir(frame_path):
-                        self.data.append((line.split(' ')[0][:-4], class_id))
-                    elif os.path.exists(frame_path) and "done" in os.listdir(frame_path):
-                        self.data.append((line.split(' ')[0][:-4], class_id))
-            f.close()
-
+        f = open(os.path.join(self.opt.annotation_path, split_lab_filenames[0]), 'r')
+        for line in f:
+            class_id = self.class_idx.get(line.split('/')[0]) - 1
+            if os.path.exists(os.path.join(self.opt.frame_dir, line.strip('\n')[:-4])) == True:
+                self.data.append((os.path.join(self.opt.frame_dir, line.strip('\n')[:-4]), class_id))
+        
+        f.close()
     def __len__(self):
         '''
         returns number of test set
@@ -181,13 +187,13 @@ class UCF101_test(Dataset):
 
     def __getitem__(self, idx):
         video = self.data[idx]
-        label_id = self.lab_names.get(video[1])
-        frame_path = os.path.join(self.opt.frame_dir, video[1], video[0])
+        label_id = video[1]
+        frame_path = os.path.join(self.opt.frame_dir, self.idx_class.get(label_id + 1), video[0])
 
         if self.opt.only_RGB:
-            Total_frames = int(len(os.listdir(frame_path))) - 2    
+            Total_frames = len(glob.glob(frame_path +  '/0*.jpg'))
         else:
-            Total_frames = int((len(os.listdir(frame_path)) + 1)/3) -1 
+            Total_frames = len(glob.glob(frame_path +  '/TVL1jpg_y_*.jpg'))
 
         clip = get_test_video(self.opt, frame_path, Total_frames)
                     
@@ -208,22 +214,25 @@ class Kinetics_test(Dataset):
         self.train_val = train
               
         # joing labnames with underscores
-        self.lab_names = sorted([f for f in os.listdir(os.path.join(self.__root_dir, "train"))])        
+        self.lab_names = sorted([f for f in os.listdir(os.path.join(self.opt.frame_dir, "train"))])        
        
         # Number of classes
         self.N = len(self.lab_names)
         assert self.N == 400
         
         # indexes for validation set
-        label_file = self.opt.annotation_path
-     
+        if train==1:
+            label_file = os.path.join(self.opt.annotation_path, 'Kinetics_train_labels.txt')
+        else:
+            label_file = os.path.join(self.opt.annotation_path, 'Kinetics_val_labels.txt')
+
         self.data = []                                     # (filename , lab_id)
     
         f = open(label_file, 'r')
         for line in f:
             class_id = int(line.strip('\n').split(' ')[-2])
             nb_frames = int(line.strip('\n').split(' ')[-1])
-            self.data.append((' '.join(line.strip('\n').split(' ')[:-2]), class_id, nb_frames))
+            self.data.append((os.path.join(self.opt.frame_dir,' '.join(line.strip('\n').split(' ')[:-2])), class_id, nb_frames))
         f.close()
             
     def __len__(self):
