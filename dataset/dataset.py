@@ -26,6 +26,9 @@ def get_test_video(opt, frame_path, Total_frames):
     i = 0
     loop = 0
     if Total_frames < opt.sample_duration: loop = 1
+    # if ('Die_Another_Day_-_Fencing_Scene_Part_1_[HD]_fencing_f_cm_np2_le_goo_0' in frame_path):
+    #     pdb.set_trace()
+    #     print(Total_frames)
     if opt.modality == 'RGB': 
         while len(clip) < max(opt.sample_duration, Total_frames):
             try:
@@ -126,9 +129,9 @@ class HMDB51_test(Dataset):
         frame_path = os.path.join(self.opt.frame_dir, video[1], video[0])
 
         if self.opt.only_RGB:
-            Total_frames = len(glob.glob(frame_path +  '/0*.jpg'))  
+            Total_frames = len(glob.glob(glob.escape(frame_path) +  '/0*.jpg'))  
         else:
-            Total_frames = len(glob.glob(frame_path +  '/TVL1jpg_y_*.jpg'))
+            Total_frames = len(glob.glob(glob.escape(frame_path) +  '/TVL1jpg_y_*.jpg'))
 
         clip = get_test_video(self.opt, frame_path, Total_frames)
                     
@@ -191,9 +194,9 @@ class UCF101_test(Dataset):
         frame_path = os.path.join(self.opt.frame_dir, self.idx_class.get(label_id + 1), video[0])
 
         if self.opt.only_RGB:
-            Total_frames = len(glob.glob(frame_path +  '/0*.jpg'))
+            Total_frames = len(glob.glob(glob.escape(frame_path) +  '/0*.jpg'))
         else:
-            Total_frames = len(glob.glob(frame_path +  '/TVL1jpg_y_*.jpg'))
+            Total_frames = len(glob.glob(glob.escape(frame_path) +  '/TVL1jpg_y_*.jpg'))
 
         clip = get_test_video(self.opt, frame_path, Total_frames)
                     
