@@ -250,6 +250,11 @@ class Kinetics_test(Dataset):
         frame_path = video[0]
         Total_frames = video[2]
 
+        if self.opt.only_RGB:
+            Total_frames = len(glob.glob(glob.escape(frame_path) +  '/0*.jpg'))  
+        else:
+            Total_frames = len(glob.glob(glob.escape(frame_path) +  '/TVL1jpg_y_*.jpg'))
+
         clip = get_test_video(self.opt, frame_path, Total_frames)
 
         return((scale_crop(clip, self.train_val, self.opt), label_id))
