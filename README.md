@@ -6,10 +6,9 @@ MARS is a strategy to learn a stream that takes only RGB frames as input
 but leverages both appearance and motion information from them. This is
 achieved by training a network to minimize the loss between its features and
 the Flow stream, along with the cross entropy loss for recognition.
-For more details, please refer to our [CVPR 2019 paper]() and our [website]().
+For more details, please refer to our [CVPR 2019 paper](https://hal.inria.fr/hal-02140558/document) and our [website](https://europe.naverlabs.com/Research/Computer-Vision/Video-Analysis/MARS).
 
-We release the testing code along trained models. We will release the training code 
-in due course of time.
+We release the testing code along trained models. 
 
 <!-- #### Performance on Kinetics400
 
@@ -56,18 +55,17 @@ in due course of time.
 
 ## Requirements
 * Python3
-
 * [Pytorch 1.0](https://pytorch.org/get-started/locally/)
-
-* ffmpeg version 3.2.4
-
 ```
 conda install pytorch torchvision cudatoolkit=9.0 -c pytorch
 ```
+* ffmpeg version 3.2.4
+* OpenCV with GPU support (will not be providing support in compiling this part)
+
+
 
 * Directory tree
  ```
-~/
     dataset/
         HMDB51/ 
             ../(dirs of class names)
@@ -93,14 +91,20 @@ conda install pytorch torchvision cudatoolkit=9.0 -c pytorch
 
     [SomethingSomethingv1](https://20bn.com/datasets/something-something/v1)
 
-* To extract frames from videos 
+* To extract only frames from videos 
 ```
 python utils1/extract_frames.py path_to_video_files path_to_extracted_frames start_class end_class
 ```
 
-* To extract optical flows from frames (coming soon ...)
+* To extract optical flows + frames from videos 
+    * Build
+    ```
+    export OPENCV=path_where_opencv_is_installed
 
-
+    g++ -std=c++11 tvl1_videoframes.cpp -o tvl1_videoframes -I${OPENCV}include/opencv4/ -L${OPENCV}lib64 -lopencv_objdetect -lopencv_features2d -lopencv_imgproc -lopencv_highgui -lopencv_core -lopencv_imgcodecs -lopencv_cudaoptflow -lopencv_cudaarithm
+    
+    python utils1/extract_frames_flows.py path_to_video_files path_to_extracted_flows_frames start_class end_class gpu_id
+    ```
 ## Models
 
 Trained models can be found [here](https://drive.google.com/drive/folders/1OVhBnZ_FmqMSj6gw9yyrxJJR8yRINb_G?usp=sharing). The names of the models are in the form of 
@@ -114,13 +118,33 @@ RGB_Kinetics_16f.pth indicates --modality RGB --dataset Kinetics --sample_durati
 For HMDB51 and UCF101, we have only provided trained models for the first split.
 
 ## Testing script
+For RGB stream:
+```
+python test_single_stream.py --batch_size 1 --n_classes 51 --model resnext --model_depth 101 \
+--log 0 --dataset HMDB51 --modality RGB --sample_duration 16 --split 1 --only_RGB  \
+--resume_path1 "trained_models/HMDB51/RGB_HMDB51_16f.pth" \
+--frame_dir "dataset/HMDB51" \
+--annotation_path "dataset/HMDB51_labels" \
+--result_path "results/"
+```
+
+For Flow stream:
+```
+python test_single_stream.py --batch_size 1 --n_classes 51 --model resnext --model_depth 101 \
+--log 0 --dataset HMDB51 --modality Flow --sample_duration 16 --split 1  \
+--resume_path1 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
+--frame_dir "dataset/HMDB51" \
+--annotation_path "dataset/HMDB51_labels" \
+--result_path "results/"
+```
+
 For single stream MARS: 
 
 ```
 python test_single_stream.py --batch_size 1 --n_classes 51 --model resnext --model_depth 101 \
---log 0 --dataset HMDB51 --modality MARS --sample_duration 16 --split 1 --only_RGB  \
+--log 0 --dataset HMDB51 --modality RGB --sample_duration 16 --split 1 --only_RGB  \
 --resume_path1 "trained_models/HMDB51/MARS_HMDB51_16f.pth" \
---frame_dir "dataset/HMDB51/" \
+--frame_dir "dataset/HMDB51" \
 --annotation_path "dataset/HMDB51_labels" \
 --result_path "results/"
 ```
@@ -131,7 +155,18 @@ python test_two_stream.py --batch_size 1 --n_classes 51 --model resnext --model_
 --log 0 --dataset HMDB51 --modality RGB --sample_duration 16 --split 1 --only_RGB  \
 --resume_path1 "trained_models/HMDB51/RGB_HMDB51_16f.pth" \
 --resume_path2 "trained_models/HMDB51/MARS_HMDB51_16f.pth" \
---frame_dir "dataset/HMDB51/" \
+--frame_dir "dataset/HMDB51" \
+--annotation_path "dataset/HMDB51_labels" \
+--result_path "results/"
+```
+
+For two streams RGB+Flow:
+```
+python test_two_stream.py --batch_size 1 --n_classes 51 --model resnext --model_depth 101 \
+--log 0 --dataset HMDB51 --modality RGB_Flow --sample_duration 16 --split 1 \
+--resume_path1 "trained_models/HMDB51/RGB_HMDB51_16f.pth" \
+--resume_path2 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
+--frame_dir "dataset/HMDB51/HMDB51_frames/" \
 --annotation_path "dataset/HMDB51_labels" \
 --result_path "results/"
 ```

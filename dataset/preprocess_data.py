@@ -300,6 +300,7 @@ def scale_crop(clip, train, opt):
     crop_position = crop_positions[random.randint(0, len(crop_positions) - 1)] 
    
     if train == 1:
+        j = 0
         for i, I in enumerate(clip):
             I = MultiScaleCornerCrop(scale = scale_factor, size = opt.sample_size, crop_position = crop_position)(I)
             I = RandomHorizontalFlip(p = flip_prob)(I)
@@ -319,21 +320,24 @@ def scale_crop(clip, train, opt):
                     processed_clip[1, int((i-1)/2), :, :] = I
 
             elif opt.modality == 'RGB_Flow':
-                for j in range(3):
-                    if j == 1 and flip_prob<0.5:                # Flipping x-direction
-                        I = ImageChops.invert(I)
-                    I = ToTensor(1)(I)                          
-                    if j == 0:
-                        I = Normalize(get_mean('activitynet'), [1,1,1,])(I)
-                        processed_clip[0:3, int(i/3), :, :] = I
-                    else:
-                        I = Normalize([127.5, 127.5, 127.5], [1,1,1])(I)
-                        if j == 1:
-                            processed_clip[3, int((i-1)/3), :, :] = I
-                        elif j == 2:
-                            processed_clip[4, int((i-2)/3), :, :] = I
+                if j == 1 and flip_prob<0.5:                # Flipping x-direction
+                    I = ImageChops.invert(I)
+                I = ToTensor(1)(I)                          
+                if j == 0:
+                    I = Normalize(get_mean('activitynet'), [1,1,1,])(I)
+                    processed_clip[0:3, int(i/3), :, :] = I
+                else:
+                    I = Normalize([127.5, 127.5, 127.5], [1,1,1])(I)
+                    if j == 1:
+                        processed_clip[3, int((i-1)/3), :, :] = I
+                    elif j == 2:
+                        processed_clip[4, int((i-2)/3), :, :] = I
+                j += 1
+                if j == 3:
+                    j = 0
 
     else:
+        j = 0
         for i, I in enumerate(clip):
             I = Scale(opt.sample_size)(I)
             I = CenterCrop(opt.sample_size)(I)
@@ -351,15 +355,17 @@ def scale_crop(clip, train, opt):
                     processed_clip[1, int((i-1)/2), :, :] = I
 
             elif opt.modality == 'RGB_Flow':
-                for j in range(3):
-                    if j == 0:
-                        I = Normalize(get_mean('activitynet'), [1,1,1,])(I)
-                        processed_clip[0:3, int(i/3), :, :] = I
-                    else:
-                        I = Normalize([127.5, 127.5, 127.5], [1,1,1])(I)                     
-                        if j == 1:
-                            processed_clip[3, int((i-1)/3), :, :] = I
-                        elif j == 2:
-                            processed_clip[4, int((i-2)/3), :, :] = I
+                if j == 0:
+                    I = Normalize(get_mean('activitynet'), [1,1,1,])(I)
+                    processed_clip[0:3, int(i/3), :, :] = I
+                else:
+                    I = Normalize([127.5, 127.5, 127.5], [1,1,1])(I)                     
+                    if j == 1:
+                        processed_clip[3, int((i-1)/3), :, :] = I
+                    elif j == 2:
+                        processed_clip[4, int((i-2)/3), :, :] = I
+                j += 1
+                if j == 3:
+                    j = 0
                     
     return(processed_clip)
