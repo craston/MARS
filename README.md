@@ -46,6 +46,14 @@ We release the testing code along trained models.
 **MARS+RGB+Flow**            								|RGB+Flow |Kinetics  |**98.1**|**80.9**|**53.0**	| -->
 
 ## Citing MARS
+```
+@inproceedings{crasto2019mars,
+  title={{MARS: Motion-Augmented RGB Stream for Action Recognition}},
+  author={Crasto, Nieves and Weinzaepfel, Philippe and Alahari, Karteek and Schmid, Cordelia},
+  booktitle={CVPR},
+  year={2019}
+}
+```
 
 ## Contents
 1. [Requirements](#requirements)
