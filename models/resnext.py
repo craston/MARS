@@ -213,6 +213,8 @@ def get_fine_tuning_parameters(model, ft_begin_index):
         ft_module_names.append('layer{}'.format(i))
     ft_module_names.append('fc')
 
+    print("Layers to finetune : ", ft_module_names)
+
     parameters = []
     for k, v in model.named_parameters():
         for ft_module in ft_module_names:

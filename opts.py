@@ -152,7 +152,7 @@ def parse_opts():
         help='Patience of LR scheduler. See documentation of ReduceLROnPlateau.')
     parser.add_argument(
         '--MARS_alpha', 
-        default=1, 
+        default=50, 
         type=float, 
         help='Weight of Flow augemented MSE loss')
     parser.add_argument(
@@ -214,7 +214,7 @@ def parse_opts():
         help='Log training and validation')
     parser.add_argument(
         '--checkpoint',
-        default=10,
+        default=2,
         type=int,
         help='Trained model is saved at every this epochs.')
     

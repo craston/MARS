@@ -99,44 +99,6 @@ class Logger_MARS(object):
         self.logger.writerow(write_values)
         self.log_file.flush()
 
-class Logger_GAN(object):
-
-    def __init__(self, path, header, resume_path, begin_epoch):
-        if resume_path == '':
-            self.log_file = open(path, 'w+')
-            self.logger = csv.writer(self.log_file, delimiter='\t')
-            self.logger.writerow(header)
-        else:
-            self.log_file = open(path, 'r+')
-            self.logger = csv.writer(self.log_file, delimiter='\t')
-            reader = csv.reader(self.log_file, delimiter='\t')
-            lines = []
-            print("begin = ", begin_epoch)
-            for line in reader:
-                lines.append(line)
-                if len(lines) == begin_epoch +1 :
-                    break
-            self.log_file.close()
-            self.log_file = open(path, 'w')
-            self.logger = csv.writer(self.log_file, delimiter='\t')
-            self.logger.writerows(lines[:begin_epoch+1])
-            self.log_file.flush()
-
-        self.header = header
-
-
-    def __del(self):
-        self.log_file.close()
-
-    def log(self, values):
-        write_values = []
-        for col in self.header:
-            assert col in values
-            write_values.append(values[col])
-
-        self.logger.writerow(write_values)
-        self.log_file.flush()
-
 
 def load_value_file(file_path):
     with open(file_path, 'r') as input_file:
@@ -151,7 +113,7 @@ def calculate_accuracy(outputs, targets):
     pred = pred.t()
     correct = pred.eq(targets.view(1, -1))
 
-    n_correct_elems = correct.float().sum().data[0]
+    n_correct_elems = correct.float().sum().item()
     
 
     return n_correct_elems / batch_size
@@ -175,14 +137,3 @@ def calculate_accuracy_video(output_buffer, i):
     # print(pred_value)
     # print("accuracy = ", 1*(np.equal(true_value, pred_value)).sum()/len(true_value))
     return 1*(np.equal(true_value, pred_value)).sum()/len(true_value)
-
-def calculate_accuracy_Discriminator(outputs, targets):
-    #pdb.set_trace()
-    batch_size = outputs.size(0)
-
-    if targets == 0:
-        n_correct_elems = np.float(sum(i<0.5 for i in outputs))
-    else:
-        n_correct_elems = np.float(sum(i>=0.5 for i in outputs))
-
-    return n_correct_elems / batch_size

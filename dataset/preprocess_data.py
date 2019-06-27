@@ -277,7 +277,7 @@ def scale_crop(clip, train, opt):
         - Random Horizonatal Flip (change direction of Flow accordingly)
         - Convert a ``PIL.Image`` or ``numpy.ndarray`` to tensor
         - Normalize R,G,B based on mean and std of ``ActivityNet``
-    Testing:
+    Testing/ Validation:
         - Scale frame
         - Center crop
         - Convert a ``PIL.Image`` or ``numpy.ndarray`` to tensor
@@ -309,7 +309,7 @@ def scale_crop(clip, train, opt):
                 I = Normalize(get_mean('activitynet'), [1,1,1])(I)
                 processed_clip[:, i, :, :] = I
 
-            elif op.modality == 'Flow':
+            elif opt.modality == 'Flow':
                 if i%2 == 0 and flip_prob<0.5:
                     I = ImageChops.invert(I)                    # Flipping x-direction
                 I = ToTensor(1)(I)

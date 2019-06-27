@@ -179,4 +179,161 @@ python test_two_stream.py --batch_size 1 --n_classes 51 --model resnext --model_
 --result_path "results/"
 ```
 
+## Training script
+### For RGB stream: 
+#### From scratch:
+```
+ python train.py --dataset Kinetics --modality RGB --only_RGB \
+--n_classes 400 \
+--batch_size 32 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101  \
+--frame_dir "dataset/Kinetics" \
+--annotation_path "dataset/Kinetics_labels" \
+--result_path "results/"
+```
 
+#### From pretrained Kinetics400:
+```
+ python train.py --dataset HMDB51 --modality RGB --split 1 --only_RGB \
+--n_classes 400 --n_finetune_classes 51 \
+--batch_size 32 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101 --ft_begin_index 4 \
+--frame_dir "dataset/HMDB51" \
+--annotation_path "dataset/HMDB51_labels" \
+--pretrain_path "trained_models/Kinetics/RGB_Kinetics_16f.pth" \
+--result_path "results/"
+```
+
+#### From checkpoint:
+```
+ python train.py --dataset HMDB51 --modality RGB --split 1 --only_RGB \
+--n_classes 400 --n_finetune_classes 51 \
+--batch_size 32 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101 --ft_begin_index 4 \
+--frame_dir "dataset/HMDB51" \
+--annotation_path "dataset/HMDB51_labels" \
+--pretrain_path "trained_models/Kinetics/RGB_Kinetics_16f.pth" \
+--resume_path1 "results/HMDB51/PreKin_HMDB51_1_RGB_train_batch32_sample112_clip16_nestFalse_damp0.9_weight_decay1e-05_manualseed1_modelresnext101_ftbeginidx4_varLR2.pth" \
+--result_path "results/"
+```
+
+### For Flow stream 
+#### From scratch:
+```
+ python train.py --dataset Kinetics --modality Flow \
+--n_classes 400 \
+--batch_size 32 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101  \
+--frame_dir "dataset/Kinetics" \
+--annotation_path "dataset/Kinetics_labels" \
+--result_path "results/"
+```
+
+#### From pretrained Kinetics400:
+```
+ python train.py --dataset HMDB51 --modality Flow --split 1 \
+--n_classes 400 --n_finetune_classes 51 \
+--batch_size 32 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101 --ft_begin_index 4 \
+--frame_dir "dataset/HMDB51" \
+--annotation_path "dataset/HMDB51_labels" \
+--pretrain_path "trained_models/Kinetics/Flow_Kinetics_16f.pth" \
+--result_path "results/"
+```
+
+#### From checkpoint:
+```
+ python train.py --dataset HMDB51 --modality Flow --split 1 \
+--n_classes 400 --n_finetune_classes 51 \
+--batch_size 32 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101 --ft_begin_index 4 \
+--frame_dir "dataset/HMDB51" \
+--annotation_path "dataset/HMDB51_labels" \
+--pretrain_path "trained_models/Kinetics/Flow_Kinetics_16f.pth" \
+--resume_path1 "results/HMDB51/PreKin_HMDB51_1_Flow_train_batch32_sample112_clip16_nestFalse_damp0.9_weight_decay1e-05_manualseed1_modelresnext101_ftbeginidx4_varLR2.pth" \
+--result_path "results/"
+```
+
+### For MARS:
+#### From scratch:  
+```
+python MARS_train.py --dataset Kinetics --modality RGB_Flow \
+--n_classes 400 \
+--batch_size 16 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101 \
+--output_layers 'avgpool' --MARS_alpha 50 \
+--frame_dir "dataset/Kinetics" \
+--annotation_path "dataset/Kinetics_labels" \
+--resume_path1 "trained_models/Kinetics/Flow_Kinetics_16f.pth" \
+--result_path "results/" --checkpoint 1
+```
+
+#### From pretrained Kinetics400:
+```
+python MARS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
+--n_classes 400 --n_finetune_classes 51 \
+--batch_size 16 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101 --ft_begin_index 4 \
+--output_layers 'avgpool' --MARS_alpha 50 \
+--frame_dir "/tmp-network/user/ncrasto/video_db/HMDB51/HMDB51_flows_min256_q/" \
+--annotation_path "dataset/HMDB51_labels" \
+--pretrain_path "trained_models/Kinetics/MARS_Kinetics_16f.pth" \
+--resume_path1 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
+--result_path "results/" --checkpoint 1
+```
+#### From checkpoint:
+```
+python MARS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
+--n_classes 400 --n_finetune_classes 51 \
+--batch_size 16 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101 --ft_begin_index 4 \
+--output_layers 'avgpool' --MARS_alpha 50 \
+--frame_dir "dataset/HMDB51" \
+--annotation_path "dataset/HMDB51_labels" \
+--pretrain_path "trained_models/Kinetics/MARS_Kinetics_16f.pth" \
+--resume_path1 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
+--MARS_resume_path "results/HMDB51/MARS_HMDB51_1_train_batch16_sample112_clip16_lr0.001_nesterovFalse_manualseed1_modelresnext101_ftbeginidx4_layeravgpool_alpha50.0_1.pth" \
+--result_path "results/" --checkpoint 1
+```
+
+### For MERS:
+#### From scratch:  
+```
+python MERS_train.py --dataset Kinetics --modality RGB_Flow \
+--n_classes 400 \
+--batch_size 16 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101 \
+--output_layers 'avgpool' --MARS_alpha 50 \
+--frame_dir "dataset/Kinetics" \
+--annotation_path "dataset/Kinetics_labels" \
+--resume_path1 "trained_models/Kinetics/Flow_Kinetics_16f.pth" \
+--result_path "results/" --checkpoint 1
+```
+
+#### From pretrained Kinetics400:
+```
+python MERS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
+--n_classes 400 --n_finetune_classes 51 \
+--batch_size 16 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101 --ft_begin_index 4 \
+--output_layers 'avgpool' --MARS_alpha 50 \
+--frame_dir "dataset/HMDB51" \
+--annotation_path "dataset/HMDB51_labels" \
+--pretrain_path "trained_models/Kinetics/MERS_Kinetics_16f.pth" \
+--resume_path1 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
+--result_path "results/" --checkpoint 1
+```
+#### From checkpoint:
+```
+python MERS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
+--n_classes 400 --n_finetune_classes 51 \
+--batch_size 16 --log 1 --sample_duration 16 \
+--model resnext --model_depth 101 --ft_begin_index 4 \
+--output_layers 'avgpool' --MARS_alpha 50 \
+--frame_dir "dataset/HMDB51" \
+--annotation_path "dataset/HMDB51_labels" \
+--pretrain_path "trained_models/Kinetics/MARS_Kinetics_16f.pth" \
+--resume_path1 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
+--MARS_resume_path "results/HMDB51/MERS_HMDB51_1_train_batch16_sample112_clip16_lr0.001_nesterovFalse_manualseed1_modelresnext101_ftbeginidx4_layeravgpool_alpha50.0_1.pth" \
+--result_path "results/" --checkpoint 1
+```
