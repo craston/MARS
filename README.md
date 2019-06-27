@@ -275,7 +275,7 @@ python MARS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
 --batch_size 16 --log 1 --sample_duration 16 \
 --model resnext --model_depth 101 --ft_begin_index 4 \
 --output_layers 'avgpool' --MARS_alpha 50 \
---frame_dir "/tmp-network/user/ncrasto/video_db/HMDB51/HMDB51_flows_min256_q/" \
+--frame_dir "dataset/HMDB51" \
 --annotation_path "dataset/HMDB51_labels" \
 --pretrain_path "trained_models/Kinetics/MARS_Kinetics_16f.pth" \
 --resume_path1 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
