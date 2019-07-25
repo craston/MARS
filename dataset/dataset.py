@@ -100,7 +100,7 @@ def get_train_video(opt, frame_path, Total_frames):
     if opt.modality == 'RGB': 
         while len(clip) < opt.sample_duration:
             try:
-                im = Image.open(os.path.join(frame_path, '%05d.jpg'%(i+1)))
+                im = Image.open(os.path.join(frame_path, '%05d.jpg'%(start_frame+i+1)))
                 clip.append(im.copy())
                 im.close()
             except:
@@ -113,8 +113,8 @@ def get_train_video(opt, frame_path, Total_frames):
     elif opt.modality == 'Flow':  
         while len(clip) < 2*opt.sample_duration:
             try:
-                im_x = Image.open(os.path.join(frame_path, 'TVL1jpg_x_%05d.jpg'%(i+1)))
-                im_y = Image.open(os.path.join(frame_path, 'TVL1jpg_y_%05d.jpg'%(i+1)))
+                im_x = Image.open(os.path.join(frame_path, 'TVL1jpg_x_%05d.jpg'%(start_frame+i+1)))
+                im_y = Image.open(os.path.join(frame_path, 'TVL1jpg_y_%05d.jpg'%(start_frame+i+1)))
                 clip.append(im_x.copy())
                 clip.append(im_y.copy())
                 im_x.close()
@@ -129,9 +129,9 @@ def get_train_video(opt, frame_path, Total_frames):
     elif  opt.modality == 'RGB_Flow':
         while len(clip) < 3*opt.sample_duration:
             try:
-                im   = Image.open(os.path.join(frame_path, '%05d.jpg'%(i+1)))
-                im_x = Image.open(os.path.join(frame_path, 'TVL1jpg_x_%05d.jpg'%(i+1)))
-                im_y = Image.open(os.path.join(frame_path, 'TVL1jpg_y_%05d.jpg'%(i+1)))
+                im   = Image.open(os.path.join(frame_path, '%05d.jpg'%(start_frame+i+1)))
+                im_x = Image.open(os.path.join(frame_path, 'TVL1jpg_x_%05d.jpg'%(start_frame+i+1)))
+                im_y = Image.open(os.path.join(frame_path, 'TVL1jpg_y_%05d.jpg'%(start_frame+i+1)))
                 clip.append(im.copy())
                 clip.append(im_x.copy())
                 clip.append(im_y.copy())
