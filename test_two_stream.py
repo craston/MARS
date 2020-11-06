@@ -60,11 +60,11 @@ def test():
     accuracies = AverageMeter()
     
     if opt.log:
-        root_dir = opt.result_path
+        result_path = opt.result_path
         if opt.only_RGB:
-            f = open(os.path.join(root_dir, "test_RGB_MARS_{}{}_{}_{}_{}.txt".format(opt.model, opt.model_depth, opt.dataset, opt.split, opt.sample_duration)), 'w+')
+            f = open(os.path.join(result_path, "test_RGB_MARS_{}{}_{}_{}_{}.txt".format(opt.model, opt.model_depth, opt.dataset, opt.split, opt.sample_duration)), 'w+')
         else:
-             f = open(os.path.join(root_dir, "test_RGB_Flow_{}{}_{}_{}_{}.txt".format(opt.model, opt.model_depth, opt.dataset, opt.split, opt.sample_duration)), 'w+')
+             f = open(os.path.join(result_path, "test_RGB_Flow_{}{}_{}_{}_{}.txt".format(opt.model, opt.model_depth, opt.dataset, opt.split, opt.sample_duration)), 'w+')
         f.write(str(opt))
         f.write('\n')
         f.flush()
