@@ -252,7 +252,7 @@ class UCF101_test(Dataset):
         # indexes for training/test set
         split_lab_filenames = sorted([file for file in os.listdir(opt.annotation_path) if file.strip('.txt')[-1] ==str(split)])
 
-        if self.train_valtest==1:
+        if self.train_val_test==1:
             split_lab_filenames = [f for f in split_lab_filenames if 'train' in f]
         else:
             split_lab_filenames = [f for f in split_lab_filenames if 'test' in f]
